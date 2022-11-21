@@ -1,13 +1,13 @@
 {
-  "name": "instagram-backend",
+  "name": "instagrambackend",
   "version": "1.0.0",
-  "description": "Instagram clone backend built using node-js",
+  "description": "Instagram clone backend",
   "main": "index.js",
   "scripts": {
     "start": "node index",
     "dev": "nodemon index"
   },
-  "author": "John Doe",
+  "author": "Bitcs",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
