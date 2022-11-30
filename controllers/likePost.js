@@ -1,64 +1,62 @@
-const jwt = require('jsonwebtoken')
-const Post = require('../model/Post')
+const jwt = require("jsonwebtoken");
+const Post = require("../model/Post");
 
 const likePost = async (req, res) => {
-    const token = req.body.token
+  const token = req.body.token;
 
-    // Can be like or unlike
-    const action = req.body.action
+  // Can be like or unlike
+  const action = req.body.action;
 
-    // Post hash
-    const hash = req.body.hash
+  // Post hash
+  const hash = req.body.hash;
 
-    if (!action || !hash) {
-        return res.json({
-            status: "fail",
-            reason: "Malformed input - action, hash fields are required"
-        })
-    }
+  if (!action || !hash) {
+    return res.json({
+      status: "fail",
+      reason: "Malformed input - action, hash fields are required",
+    });
+  }
 
-    if (token === undefined) {
-        return res.json({
-            status: "fail",
-            reason: "Please log in to access this page"
-        })
-    }
+  if (token === undefined) {
+    return res.json({
+      status: "fail",
+      reason: "Please log in to access this page",
+    });
+  }
 
-    let data
+  let data;
 
-    try {
-        data = jwt.verify(token, process.env.JWT_ACCESS_TOKEN)
-    } catch (error) {
-        return res.json({
-            status: "fail",
-            reason: "Invalid token. Please login again to get a new token."
-        })
-    }
+  try {
+    data = jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
+  } catch (error) {
+    return res.json({
+      status: "fail",
+      reason: "Invalid token. Please login again to get a new token.",
+    });
+  }
 
-    let condition = { $addToSet: { likes: data.username }}
+  let condition = { $addToSet: { likes: data.username } };
 
-    if (action == "unlike") {
-        condition = { $pull: { likes: data.username }}
-    }
+  if (action == "unlike") {
+    condition = { $pull: { likes: data.username } };
+  }
 
-    const updated = await Post.findOneAndUpdate(
-        { hash },
-        condition,
-        { new: true }
-    ).select("-_id -__v")
+  const updated = await Post.findOneAndUpdate({ hash }, condition, {
+    new: true,
+  }).select("-_id -__v");
 
-    if (updated === null) {
-        return res.json({
-            status: "fail",
-            reason: "Invalid post hash"
-        })
-    }
+  if (updated === null) {
+    return res.json({
+      status: "fail",
+      reason: "Invalid post hash",
+    });
+  }
 
-    res.json({
-        status: "success",
-        action,
-        post: updated
-    })
-}
+  res.json({
+    status: "success",
+    action,
+    post: updated,
+  });
+};
 
-module.exports = likePost
+module.exports = likePost;

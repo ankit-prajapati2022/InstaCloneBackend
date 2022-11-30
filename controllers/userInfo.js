@@ -1,60 +1,60 @@
-const jwt = require('jsonwebtoken')
-const User = require('../model/User')
+const jwt = require("jsonwebtoken");
+const User = require("../model/User");
 
 const userInfo = async (req, res) => {
-    const token = req.body.token
-    const username = req.body.username
+  const token = req.body.token;
+  const username = req.body.username;
 
-    if (token === undefined) {
-        return res.json({
-            status: "fail",
-            reason: "Please log in to access this page"
-        })
+  if (token === undefined) {
+    return res.json({
+      status: "fail",
+      reason: "Please log in to access this page",
+    });
+  }
+
+  let data;
+
+  try {
+    data = jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
+  } catch (error) {
+    return res.json({
+      status: "fail",
+      reason: "Invalid token. Please login again to get a new token.",
+    });
+  }
+
+  data = await User.find(
+    { username },
+    {
+      _id: false,
+      __v: false,
+      email: false,
+      phone: false,
+      password: false,
     }
+  );
 
-    let data
+  if (data.length === 0) {
+    return res.json({
+      status: "success",
+      reason: `User @${username} doesn't exist`,
+      data: null,
+    });
+  }
 
-    try {
-        data = jwt.verify(token, process.env.JWT_ACCESS_TOKEN)
-    } catch (error) {
-        return res.json({
-            status: "fail",
-            reason: "Invalid token. Please login again to get a new token."
-        })
-    }
+  const user = { ...data[0]._doc };
 
-    data = await User.find(
-        { username },
-        {
-            _id: false, 
-            __v: false, 
-            email: false,
-            phone: false,
-            password: false
-        }
-    )
+  if (user.profile == "Private") {
+    user.posts = user.posts.length;
+    user.followers = user.followers.length;
+    user.following = user.following.length;
+  }
 
-    if (data.length === 0) {
-        return res.json({
-            status: "success",
-            reason: `User @${username} doesn't exist`,
-            data: null
-        })
-    }
+  res.json({
+    status: "success",
+    reason: `Profile information for @${username}`,
+    data: user,
+  });
+};
 
-    const user = {...data[0]._doc}
-
-    if (user.profile == "Private") {
-        user.posts = user.posts.length
-        user.followers = user.followers.length
-        user.following = user.following.length
-    }
-
-    res.json({
-        status: "success",
-        reason: `Profile information for @${username}`,
-        data: user
-    })
-}
-
-module.exports = userInfo
+module.exports = userInfo;
