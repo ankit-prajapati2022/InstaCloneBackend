@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../model/User");
+const Post = require("../model/Post");
 
 const userInfo = async (req, res) => {
   const token = req.body.token;
@@ -33,6 +34,18 @@ const userInfo = async (req, res) => {
     }
   );
 
+  let posts = data.posts;
+
+  posts = await Post.find(
+    { _id: { $in: posts } },
+    {
+      _id: false,
+      __v: false,
+      username: false,
+      hash: false,
+    }
+  );
+
   if (data === null) {
     return res.json({
       status: "fail",
@@ -44,6 +57,7 @@ const userInfo = async (req, res) => {
     status: "success",
     reason: "Successfully fetched data for " + username,
     data,
+    posts,
   });
 };
 

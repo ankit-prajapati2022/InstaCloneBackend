@@ -40,4 +40,4 @@ const userSchema = new Schema({
   posts: [Schema.Types.ObjectId],
 });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("InstaUser", userSchema);
