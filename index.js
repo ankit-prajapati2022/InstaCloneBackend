@@ -32,6 +32,8 @@ mongoose
     console.log(error);
   });
 
-app.listen(PORT, () => {
+const server = require("http").createServer(app);
+
+server.listen(PORT, () => {
   console.log("Server running on port " + PORT);
 });
