@@ -5,7 +5,7 @@ const cookies = require("cookie-parser");
 const express = require("express");
 const app = express();
 
-// const authRoute = require("./routes/api/auth");
+const authRoute = require("./routes/api/auth");
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cors());
 
-// app.use("/api", authRoute);
+app.use("/api", authRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
